@@ -7,12 +7,12 @@
   <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="MX Countdown">
+  <meta name="apple-mobile-web-app-title" content="MX Timer">
   <meta name="description" content="A beautiful live countdown to March 4, 2027 — the journey to Manila.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="MX Countdown — March 4, 2027">
+  <meta property="og:title" content="MX Timer">
   <meta property="og:description" content="Counting down every second to March 4, 2027.">
-  <title>MX Countdown — March 4, 2027</title>
+  <title>MX Timer</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23080d17'/%3E%3Cpath d='M11 44V20l11 15 10-15v24M39 20l14 24m0-24L39 44' fill='none' stroke='%23e9c88a' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <style>
     :root {
@@ -63,7 +63,7 @@
       background: radial-gradient(ellipse, rgba(235,190,118,.045), transparent 65%);
       filter: blur(26px);
     }
-    .shell { position: relative; z-index: 1; max-width: 1312px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 68px); }
+    .shell { position: relative; z-index: 1; max-width: 1312px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 68px); min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
     .topbar {
       min-height: 100px; display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1px solid var(--line);
@@ -84,7 +84,7 @@
     .live { display:flex; gap: 10px; align-items:center; white-space:nowrap; color:#dce4f0; }
     .live-dot { width: 7px; height: 7px; background: #8fdbb5; border-radius: 50%; box-shadow: 0 0 0 5px rgba(143,219,181,.08), 0 0 15px rgba(143,219,181,.37); animation: breathe 3s ease-in-out infinite; }
     @keyframes breathe { 50% { opacity: .5; box-shadow: 0 0 0 8px rgba(143,219,181,.04); } }
-    main { padding-top: clamp(24px, 4.5vw, 64px); padding-bottom: 72px; }
+    main { padding-block: clamp(24px, 5vw, 64px); width: 100%; }
     .hero { text-align:center; position:relative; }
     .overline { display:flex; justify-content:center; align-items:center; gap: 17px; text-transform:uppercase; font-size: 10px; font-weight: 730; letter-spacing:.33em; color: var(--gold); }
     .overline::before,.overline::after { content:""; width: 38px; height: 1px; background: linear-gradient(to right, transparent, rgba(233,200,138,.55)); }
@@ -178,7 +178,7 @@
       .brand { font-size:12px; }
       .topmeta .meta-date { display:none; }
       .topmeta { font-size:9px; letter-spacing:.1em; }
-      main { padding-top:24px; }
+      main { padding-block: 24px; }
       h1 { font-size:clamp(43px, 11vw, 62px); margin-top:24px; }
       .overline { font-size:9px; letter-spacing:.23em; gap:10px; }
       .overline::before,.overline::after { width:18px; }
@@ -223,17 +223,6 @@
 <body>
   <div class="ambient" aria-hidden="true"></div>
   <div class="shell">
-    <header class="topbar">
-      <div class="identity" aria-label="MX Countdown">
-        <div class="mark" aria-hidden="true">
-          <svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M3 22V8l6.3 9.5L15 8v14M19 8l8 14M27 8l-8 14"/></svg>
-        </div>
-        <div class="brand">MX <span style="font-weight:450;color:#d6dce7">COUNTDOWN</span></div>
-      </div>
-      <div class="topmeta">
-        <span class="live"><span class="live-dot" aria-hidden="true"></span> LIVE COUNTDOWN</span>
-      </div>
-    </header>
     <main>
 
       <section class="countdown" aria-label="Live countdown to March 4, 2027">
@@ -261,23 +250,6 @@
         </div>
       </section>
 
-      <section class="details" aria-label="Countdown details">
-        <div class="detail-card">
-          <div class="detail-top"><span>THE COUNTDOWN JOURNEY</span><strong id="progress-label">0.0%</strong></div>
-          <div class="track" role="progressbar" aria-label="Time progress since October 18, 2026" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track"><div id="progress" class="track-fill"></div></div>
-          <div class="detail-foot"><span>18 OCT 2026</span><span>04 MAR 2027</span></div>
-        </div>
-        <div class="detail-card day-card">
-          <div>
-            <small>CALENDAR DAYS LEFT</small>
-            <strong id="total-days">---</strong>
-            <div class="day-caption">Until the day arrives</div>
-          </div>
-          <div class="day-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 21 4l-6.5 17-3.6-7.1L3 11.5Z"/><path d="m10.9 13.9 10.1-9.9"/></svg>
-          </div>
-        </div>
-      </section>
     </main>
   </div>
   <div class="sr-only" id="screenreader" aria-live="polite" aria-atomic="true"></div>
@@ -287,7 +259,6 @@
       // March 4, 2027 at 00:00 Baghdad time (Asia/Baghdad, UTC+03).
       // An explicit UTC instant means all devices count down to the SAME moment.
       const TARGET = Date.parse("2027-03-03T21:00:00Z");
-      const START = Date.parse("2026-10-17T21:00:00Z");
       const BAGHDAD_OFFSET_MS = 3 * 60 * 60 * 1000;
       const formatter = new Intl.DateTimeFormat("en-GB", {
         timeZone: "Asia/Baghdad", year: "numeric", month: "2-digit", day: "2-digit",
@@ -358,17 +329,10 @@
         const local = formatter.format(new Date(now));
         const clock = local.match(/(\d{2}:\d{2}:\d{2})/);
         document.getElementById("baghdad-clock").textContent = "BAGHDAD · " + (clock ? clock[1] : local);
-        document.getElementById("total-days").textContent = String(Math.ceil(remaining / 86400000)).padStart(3, "0");
-        const percentage = Math.min(100, Math.max(0, ((now - START) / (TARGET - START)) * 100));
-        const percentLabel = percentage.toFixed(1) + "%";
-        document.getElementById("progress").style.width = percentage + "%";
-        document.getElementById("progress-label").textContent = percentLabel;
-        document.getElementById("progress-track").setAttribute("aria-valuenow", percentage.toFixed(1));
 
         if (now >= TARGET && !completed) {
           completed = true;
           document.getElementById("status").innerHTML = "<b>The moment is here.</b>";
-          document.title = "It's March 4 — MX Countdown";
           screenreader.textContent = "The countdown has finished. It's March 4, 2027 in Baghdad.";
         } else if (remaining > 0) {
           const minute = Math.floor(now / 60000);
