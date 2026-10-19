@@ -185,6 +185,45 @@ body{
   .value {font-size:61px}
 }
 
+
+/* One sharp, white, attribution-free motivational line beneath the timer. */
+.screen {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+.timer-shell {
+  margin-top:auto;
+  margin-bottom:auto;
+  flex:0 0 auto;
+}
+.quote-footer {
+  flex:0 0 auto;
+  width:100%;
+  max-width:1100px;
+  padding:clamp(25px,5vh,54px) 6px clamp(10px,2vh,22px);
+  text-align:center;
+  color:#fff;
+  background:transparent;
+  border:0;
+}
+.quote-footer p {
+  margin:0;
+  color:#fff;
+  font-family:Tahoma,"Segoe UI",Arial,sans-serif;
+  font-size:clamp(17px,1.85vw,24px);
+  font-weight:700;
+  line-height:1.9;
+  letter-spacing:0;
+  -webkit-font-smoothing:antialiased;
+  text-wrap:balance;
+}
+@media(max-width:600px){
+  .quote-footer {padding:40px 9px 18px}
+  .quote-footer p {font-size:clamp(16px,4.35vw,20px);line-height:1.8}
+}
+
 </style>
 </head>
 <body>
@@ -197,6 +236,7 @@ body{
 <div class="unit"><div class="dial"><span id="minutes" class="value">--</span></div><span class="label">MINUTES</span></div>
 <div class="unit"><div class="dial"><span id="seconds" class="value">--</span></div><span class="label">SECONDS</span></div></section>
   </main>
+  <footer class="quote-footer" lang="ar" dir="rtl"><p id="daily-quote">كل دقيقة تأجل بيها حياتك، هي دقيقة مستحيل ترجع.</p></footer>
 </div>
 <div class="sr-only" id="screenreader" aria-live="polite" aria-atomic="true"></div>
 <script>
@@ -393,6 +433,26 @@ body{
       document.addEventListener("visibilitychange", function () {
         if (!document.hidden && !completed) update();
       });
+    })();
+  </script>
+
+  <script>
+    (function(){
+      "use strict";
+      const lines = ["كل دقيقة تأجل بيها حياتك، هي دقيقة مستحيل ترجع.","الوقت ما ينتظر أحد. يا تتحرك، يا تبقى مكانك والعمر يمشي.","ماكو يوم مثالي راح يجي وينقذك. ابدأ باليوم الموجود.","الأعذار ما تبني مستقبل. الشغل وحده يغيّر الواقع.","كل مرة تكول باچر، إنت تتنازل عن فرصة اليوم.","السنين ما تضيع فجأة؛ تضيع من دقائق تكول عنها مو مهمة.","إذا تنتظر الظروف تصير مثالية، راح تنتظر عمرك كله.","لا تحسب شكد باقي. احسب شنو سويت بالوقت اللي راح.","الندم ما يرجّع ساعة وحدة. القرار اليوم بيدك.","الوقت اللي تقتله هسه، راح تحتاجه يوم وما تلگاه.","مو كل شخص مشغول ديتقدم. التقدم يحتاج فعل، مو ضوضاء.","الأيام ما توقف حتى تلحگ أحلامك. إنت لازم تتحرك.","الفرص ما تدگ الباب للأبد. ترددك إله ثمن.","حياتك ما تتغير لأنك فكرت هواية. تتغير من تسوي شي.","لا تنتظر الدافع. انضباطك لازم يشتغل حتى من ما إلك خلك.","بعد سنة راح تتمنى لو بديت اليوم. لا تعيد نفس الغلطة.","كل تأجيل بسيط يتراكم، وبالنهاية يصير عمر كامل.","إذا تريد نتيجة مختلفة، لازم يومك ما يبقى نفس البارحة.","راقب أفعالك، مو وعودك لنفسك. النتائج ما تسمع الكلام.","ماكو أحد مسؤول عن وقتك غيرك. لا تضيّعه وتلوم الظروف.","الخوف من البداية ما يحميك؛ بس يسرق منك الوقت.","العمر ما يعوّض أيامك الفارغة. املأها بشي يستحق.","من تضيع ساعة بإرادتك، لا تستغرب من ضياع سنين بدون قصد.","لا تنتظر اللحظة المناسبة. اصنعها قبل ما تنتهي الفرصة.","إذا ما تبدي هسه، راح تبقى تعرف شتريد وما توصل إله.","كل يوم تأجّل بيه قرارك، هو قرار إنك تبقى بنفس المكان.","وقت الانتظار ممكن يكون وقت الإنجاز. الخيار إلك.","اللي تسويه اليوم أقوى من ألف خطة نايمات براسك.","العمر مو بروفة. كل يوم يمر محسوب عليك.","انشغل ببناء حياتك بدل ما تنتظرها تبدي."];
+      let previous = -1;
+      try {
+        const saved = window.sessionStorage.getItem("mx-timer-last-quote");
+        if (saved !== null) {
+          const parsed = Number(saved);
+          if (Number.isInteger(parsed) && parsed >= 0 && parsed < lines.length) previous = parsed;
+        }
+      } catch (_) { /* Storage may be disabled; quotes still work. */ }
+      let choice = Math.floor(Math.random() * (lines.length - (previous >= 0 ? 1 : 0)));
+      if (previous >= 0 && choice >= previous) choice++;
+      const target = document.getElementById("daily-quote");
+      if (target) target.textContent = lines[choice];
+      try { window.sessionStorage.setItem("mx-timer-last-quote", String(choice)); } catch (_) {}
     })();
   </script>
 </body>
