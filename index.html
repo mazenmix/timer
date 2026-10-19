@@ -16,6 +16,9 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=3">
   <link rel="manifest" href="site.webmanifest?v=3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&display=swap" rel="stylesheet">
   <style>
 :root {
   color-scheme: dark;
@@ -238,6 +241,131 @@ body {
 @media(prefers-reduced-motion:reduce) {
   *,*::before,*::after {animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+/* MX Timer | watch-inspired slender numerals and finely lit 3D chronograph rings */
+@property --progress {syntax:"<percentage>";initial-value:34%;inherits:false}
+@property --arc-light {syntax:"<color>";initial-value:#e2fff5;inherits:false}
+@property --arc-mid {syntax:"<color>";initial-value:#80ffda;inherits:false}
+@property --arc-main {syntax:"<color>";initial-value:#24ffaa;inherits:false}
+@property --arc-track {syntax:"<color>";initial-value:#12352d;inherits:false}
+.dial {
+  --progress:34%;
+  --arc-light:#e2fff5;
+  --arc-mid:#80ffda;
+  --arc-main:#24ffaa;
+  --arc-track:#13382e;
+  background: conic-gradient(
+    from -90deg,
+    var(--arc-light) 0%,
+    var(--arc-mid) 2.5%,
+    var(--arc-main) var(--progress),
+    var(--arc-track) var(--progress),
+    var(--arc-track) 100%
+  );
+  box-shadow:
+    0 0 0 1px color-mix(in srgb,var(--arc-mid) 35%,transparent),
+    0 1px 1px rgba(255,255,255,.09) inset,
+    0 0 8px color-mix(in srgb,var(--arc-main) 36%,transparent),
+    0 0 26px color-mix(in srgb,var(--arc-main) 26%,transparent),
+    0 0 51px color-mix(in srgb,var(--arc-main) 11%,transparent);
+  transition:
+    --progress .78s cubic-bezier(.2,.73,.22,1),
+    --arc-light .72s ease,
+    --arc-mid .72s ease,
+    --arc-main .72s ease,
+    --arc-track .72s ease,
+    box-shadow .72s ease,
+    filter .72s ease;
+  filter:saturate(1.045);
+  will-change:auto;
+}
+.dial.warn {
+  --arc-light:#fffde8;
+  --arc-mid:#ffe582;
+  --arc-main:#ffc341;
+  --arc-track:#48371b;
+}
+.dial.danger {
+  --arc-light:#ffeae9;
+  --arc-mid:#ff9993;
+  --arc-main:#ff4d46;
+  --arc-track:#492021;
+}
+.dial::before {
+  background:
+    radial-gradient(ellipse at 47% 8%,rgba(214,255,242,.13),transparent 47%),
+    radial-gradient(ellipse at 50% 38%,#182d30 0%,#0b191c 56%,#071114 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(227,255,247,.13),
+    inset 0 3px 6px rgba(255,255,255,.025),
+    inset 0 -17px 33px rgba(0,0,0,.42),
+    0 0 14px rgba(0,0,0,.27);
+}
+.dial::after {
+  background:
+    radial-gradient(ellipse at 24% 16%,rgba(255,255,255,.34),transparent 26%),
+    linear-gradient(160deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 19%,transparent 33%,transparent 73%,rgba(255,255,255,.035) 100%);
+}
+.shine {
+  width:56%;
+  height:20%;
+  top:7%;
+  left:17%;
+  background:linear-gradient(180deg,rgba(255,255,255,.19),rgba(255,255,255,.015) 73%,transparent);
+  filter:blur(3.3px);
+}
+/* Open-license condensed numerals approximate Zenith; Apple's proprietary font isn't embedded. */
+.value {
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  gap:.008em;
+  width:100%;
+  height:1.18em;
+  font-family:"Barlow Condensed","SF Pro Display","SF Compact Display","Arial Narrow",sans-serif;
+  font-weight:600;
+  font-size:clamp(56px,6.0vw,88px);
+  line-height:1;
+  letter-spacing:0;
+  font-stretch:condensed;
+  font-feature-settings:"tnum" 1, "ss01" 1, "ss02" 1;
+  transform:scaleX(.88);
+  text-shadow:0 1px 1px rgba(0,0,0,.38),0 0 11px rgba(255,255,255,.09);
+  backface-visibility:hidden;
+}
+.digit-window {
+  position:relative;
+  display:inline-block;
+  flex:0 0 .54em;
+  width:.54em;
+  height:1.12em;
+  overflow:hidden;
+}
+.digit-face {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#f6fffd;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  will-change:transform,opacity;
+  backface-visibility:hidden;
+}
+@media(max-width:1080px) {
+  .value {font-size:clamp(47px,5.5vw,71px)}
+}
+@media(max-width:830px) {
+  .value {font-size:clamp(53px,10vw,77px)}
+}
+@media(max-width:480px) {
+  .value {font-size:clamp(43px,13vw,63px)}
+}
+@media(max-width:350px) {
+  .value {font-size:43px}
+}
+
 </style>
 </head>
 <body>
@@ -308,15 +436,71 @@ body {
         return [months, weeks, days, hours, minutes, seconds];
       }
 
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      // Each digit slides independently, keeping a stable baseline and avoiding text-width jumps.
+      function newGlyph(char) {
+        const glyph = document.createElement("span");
+        glyph.className = "digit-face";
+        glyph.textContent = char;
+        return glyph;
+      }
       function setNumber(node, number) {
-        const value = String(number).padStart(2, "0");
-        if (node.textContent === value) return;
-        node.textContent = value;
-        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          node.classList.remove("tick");
-          void node.offsetWidth;
-          node.classList.add("tick");
+        const text = String(number).padStart(2, "0");
+        if (node.dataset.number === text) return;
+        const firstRender = !node.dataset.number;
+        node.dataset.number = text;
+        node.setAttribute("aria-label", text);
+        if (firstRender) {
+          node.textContent = "";
+          for (const char of text) {
+            const win = document.createElement("span");
+            win.className = "digit-window";
+            win.dataset.digit = char;
+            win.appendChild(newGlyph(char));
+            node.appendChild(win);
+          }
+          return;
         }
+        [...node.children].forEach(function(win, i) {
+          const nextChar = text[i];
+          if (win.dataset.digit === nextChar) return;
+          win.dataset.digit = nextChar;
+          const prevChar = win.querySelector(".digit-face")?.textContent || "0";
+          const outgoing = newGlyph(prevChar);
+          const incoming = newGlyph(nextChar);
+          win.replaceChildren(outgoing, incoming);
+          if (reduceMotion.matches || !incoming.animate) {
+            win.replaceChildren(incoming);
+            return;
+          }
+          const options = { duration: 490, easing: "cubic-bezier(.19,.75,.2,1)", fill: "forwards" };
+          outgoing.animate([
+            { transform: "translate3d(0,0,0)", opacity: 1, filter: "blur(0px)" },
+            { transform: "translate3d(0,44%,0)", opacity: 0, filter: "blur(.9px)" }
+          ], options);
+          const animation = incoming.animate([
+            { transform: "translate3d(0,-47%,0)", opacity: 0, filter: "blur(.9px)" },
+            { transform: "translate3d(0,0,0)", opacity: 1, filter: "blur(0px)" }
+          ], options);
+          animation.finished.then(function() {
+            if (win.dataset.digit === nextChar && incoming.parentNode === win) {
+              win.replaceChildren(incoming);
+            }
+          }).catch(function(){ /* Newer digit superseded this animation. */ });
+        });
+      }
+
+      // Each circle tracks its own unit. Thresholds apply to the REAL remaining
+      // fraction, not to a decorative display percentage.
+      const unitMax = [12, 4, 7, 24, 60, 60];
+      function updateDial(node, number, index) {
+        const fraction = Math.max(0, Math.min(1, number / unitMax[index]));
+        const dial = node.closest(".dial");
+        // Leave a small illuminated marker at zero so red remains visible.
+        const displayFraction = Math.max(0.045, fraction);
+        dial.style.setProperty("--progress", (displayFraction * 100).toFixed(3) + "%");
+        dial.classList.toggle("danger", fraction <= 0.10);
+        dial.classList.toggle("warn", fraction > 0.10 && fraction <= 0.20);
       }
 
       function update() {
@@ -325,10 +509,7 @@ body {
         const numbers = breakdown(Math.floor(now / 1000) * 1000);
         ids.forEach(function(id, i) {
           setNumber(nodes[id], numbers[i]);
-          const max = [12, 4, 7, 24, 60, 60][i];
-          const fraction = ((numbers[i] % max) / max);
-          const percent = Math.round(24 + (1 - fraction) * 66);
-          nodes[id].parentElement.style.setProperty("--p", percent + "%");
+          updateDial(nodes[id], numbers[i], i);
         });
 
         if (now >= TARGET && !completed) {
