@@ -20,363 +20,141 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&display=swap" rel="stylesheet">
   <style>
-:root {
-  color-scheme: dark;
-  --bg: #04090d;
-  --panel: #09161a;
-  --text: #f8fffd;
-  --muted: #afcfc6;
-  --mint-ice: #e3fff6;
-  --mint-light: #baffea;
-  --mint: #68ffcd;
-  --emerald: #21ffab;
-  --ring-track: #11362d;
-}
+:root {color-scheme:dark;--background:#000;--text:#f7fffd;--muted:#b0bfb9}
 * {box-sizing:border-box}
-html {min-width:320px;min-height:100%;background:var(--bg)}
+html {min-width:320px;min-height:100%;background:#000}
 body {
-  margin:0;
-  min-height:100vh;
-  min-height:100svh;
-  overflow-x:hidden;
-  color:var(--text);
-  background:#04090d;
-  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
-  font-feature-settings:"tnum" 1;
+  margin:0;min-height:100vh;min-height:100svh;overflow-x:hidden;
+  background:#000;color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,
+  BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;font-feature-settings:"tnum" 1;
 }
 .screen {
-  min-height:100vh;
-  min-height:100svh;
-  padding:clamp(12px,3vw,38px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;min-height:100svh;padding:clamp(12px,3vw,35px);
+  background:#000;
 }
+/* Intentionally invisible frame: only the rings and their labels remain. */
 .timer-shell {
-  position:relative;
-  width:min(1280px,100%);
-  padding:clamp(26px,3.45vw,44px) clamp(16px,2.8vw,36px);
-  border-radius:30px;
-  background:
-    linear-gradient(157deg,rgba(23,48,47,.16),transparent 42%),
-    linear-gradient(180deg,#0c1b1d 0%,#071114 58%,#0a171a 100%);
-  border:1px solid rgba(138,255,212,.24);
-  box-shadow:
-    inset 0 1px 0 rgba(245,255,251,.09),
-    inset 0 -1px 0 rgba(104,255,194,.07),
-    0 20px 75px rgba(0,0,0,.54),
-    0 0 42px rgba(25,255,164,.065);
+  position:relative;width:min(1250px,100%);padding:0;
+  background:#000;border:0;outline:0;border-radius:0;box-shadow:none;
+  backdrop-filter:none;
 }
-.timer-shell::before,.timer-shell::after {
-  content:"";
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  width:clamp(72px,9vw,115px);
-  height:2px;
-  border-radius:999px;
-  background:linear-gradient(90deg,transparent,#d5fff1 45%,#62ffc6 60%,transparent);
-  box-shadow:0 0 14px rgba(80,255,181,.52);
-  pointer-events:none;
-}
-.timer-shell::before {top:0}
-.timer-shell::after {bottom:0}
+.timer-shell::before,.timer-shell::after {content:none;display:none}
 .grid {
-  display:grid;
-  grid-template-columns:repeat(6,minmax(0,1fr));
-  gap:clamp(8px,1.2vw,16px);
-  align-items:center;
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));
+  align-items:start;gap:clamp(12px,1.45vw,22px);
 }
 .unit {
-  position:relative;
-  min-width:0;
-  min-height:203px;
-  padding:14px 4px 12px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-  border-radius:22px;
-  background:linear-gradient(180deg,rgba(31,64,59,.12),rgba(8,16,20,.035));
+  min-width:0;display:flex;flex-direction:column;
+  justify-content:flex-start;align-items:center;
+  gap:clamp(12px,1.35vw,19px);
+  padding:0;margin:0;min-height:0;aspect-ratio:auto;
+  background:transparent;border:none;border-radius:0;box-shadow:none;
 }
-.unit:not(:last-child)::after {
-  content:"";
-  position:absolute;
-  right:calc(clamp(8px,1.2vw,16px)/-2);
-  top:33%;
-  width:1px;
-  height:33%;
-  background:linear-gradient(transparent,rgba(116,255,207,.26),transparent);
-  box-shadow:0 0 10px rgba(31,255,171,.16);
-}
+.unit::before,.unit::after {content:none!important;display:none!important}
+@property --progress {syntax:"<percentage>";initial-value:34%;inherits:false}
+@property --arc-light {syntax:"<color>";initial-value:#78ffcf;inherits:false}
+@property --arc-mid {syntax:"<color>";initial-value:#43ffc1;inherits:false}
+@property --arc-main {syntax:"<color>";initial-value:#20ffa3;inherits:false}
+@property --arc-track {syntax:"<color>";initial-value:#14392e;inherits:false}
 .dial {
-  --p:34%;
-  position:relative;
-  display:grid;
-  place-items:center;
-  isolation:isolate;
-  flex-shrink:0;
-  width:min(100%,160px);
-  aspect-ratio:1;
-  border-radius:50%;
-  /* A sharp, high-resolution CSS ring instead of a blurred bitmap. */
+  --progress:34%;--arc-light:#78ffcf;--arc-mid:#43ffc1;
+  --arc-main:#20ffa3;--arc-track:#14392e;
+  position:relative;isolation:isolate;flex-shrink:0;
+  display:grid;place-items:center;
+  width:min(100%,162px);aspect-ratio:1;border-radius:50%;
   background:conic-gradient(from -90deg,
-    var(--mint-ice) 0%,
-    var(--mint-light) 2.5%,
-    #8fffd9 5%,
-    #53ffc4 10%,
-    var(--emerald) var(--p),
-    #10392e var(--p),
-    #15332e 100%);
-  box-shadow:
-    0 0 0 1px rgba(169,255,223,.35),
-    0 0 6px rgba(99,255,196,.4),
-    0 0 21px rgba(48,255,169,.28),
-    0 0 45px rgba(27,255,164,.12),
-    inset 0 0 1px 1px rgba(238,255,250,.3);
-  transition:box-shadow .35s ease;
+    var(--arc-light) 0%,var(--arc-mid) 2.5%,
+    var(--arc-main) var(--progress),
+    var(--arc-track) var(--progress),var(--arc-track) 100%);
+  box-shadow:0 0 1px color-mix(in srgb,var(--arc-main) 25%,transparent),
+    0 0 12px color-mix(in srgb,var(--arc-main) 13%,transparent);
+  transition:--progress .78s cubic-bezier(.2,.73,.22,1),
+    --arc-light .7s ease,--arc-mid .7s ease,
+    --arc-main .7s ease,--arc-track .7s ease,
+    box-shadow .7s ease;
 }
+.dial.warn {--arc-light:#ffe06a;--arc-mid:#ffd34a;--arc-main:#ffbe23;--arc-track:#443413}
+.dial.danger {--arc-light:#ff8a80;--arc-mid:#ff625a;--arc-main:#ff3b35;--arc-track:#431b19}
+/* Completely solid black interiors: no white reflections, glass patches, or gradients. */
 .dial::before {
-  content:"";
-  position:absolute;
-  inset:7px;
-  z-index:0;
-  border-radius:50%;
-  background:
-    radial-gradient(ellipse at 49% 12%,rgba(158,255,220,.135),transparent 44%),
-    radial-gradient(circle at 50% 43%,#152b2c,#0a191b 62%,#071114 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(167,255,214,.18),
-    inset 0 2px 8px rgba(146,255,218,.09),
-    inset 0 -13px 27px rgba(0,0,0,.38);
+  content:"";position:absolute;inset:8px;border-radius:50%;
+  background:#000;box-shadow:none;z-index:0;
 }
-.dial::after {
-  content:"";
-  position:absolute;
-  z-index:2;
-  inset:2px;
-  border-radius:50%;
-  background:
-    radial-gradient(ellipse at 25% 15%,rgba(255,255,255,.3),transparent 27%),
-    linear-gradient(157deg,rgba(235,255,248,.22) 0%,rgba(204,255,238,.095) 21%,transparent 32%,transparent 76%,rgba(98,255,189,.045) 100%);
-  mix-blend-mode:screen;
-  pointer-events:none;
-}
-.shine {
-  position:absolute;
-  z-index:2;
-  pointer-events:none;
-  width:53%;
-  height:19%;
-  top:7%;
-  left:16%;
-  border-radius:50%;
-  transform:rotate(-19deg);
-  background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.02) 65%,transparent);
-  filter:blur(4px);
-}
+.dial::after,.shine {content:none;display:none!important}
 .value {
-  position:relative;
-  z-index:3;
-  color:#fbfffd;
-  font-size:clamp(36px,4.45vw,64px);
-  font-weight:770;
-  line-height:1;
-  letter-spacing:-.05em;
+  position:relative;z-index:1;display:inline-flex;align-items:center;
+  justify-content:center;gap:.008em;width:100%;height:1.18em;
+  color:#f7fffd;font-family:"Barlow Condensed","SF Pro Display",
+    "SF Compact Display","Arial Narrow",sans-serif;
+  font-weight:600;font-size:clamp(56px,6vw,88px);line-height:1;
+  letter-spacing:0;font-stretch:condensed;
+  font-feature-settings:"tnum" 1,"ss01" 1,"ss02" 1;
   font-variant-numeric:tabular-nums lining-nums;
-  white-space:nowrap;
-  text-shadow:0 1px 1px rgba(0,0,0,.3),0 0 10px rgba(255,255,255,.09),0 0 18px rgba(96,255,200,.10);
+  transform:scaleX(.88);text-shadow:none;backface-visibility:hidden;
 }
-.value.tick {animation:tick .24s cubic-bezier(.2,.7,.3,1)}
-@keyframes tick {from{opacity:.67;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}
+.digit-window {
+  position:relative;display:inline-block;flex:0 0 .54em;
+  width:.54em;height:1.12em;overflow:hidden;
+}
+.digit-face {
+  position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;color:#f7fffd;line-height:1;
+  font-variant-numeric:tabular-nums;
+  will-change:transform,opacity;backface-visibility:hidden;
+}
 .label {
-  color:var(--muted);
-  font-size:clamp(9px,.9vw,12px);
-  font-weight:760;
-  line-height:1.3;
-  text-align:center;
-  letter-spacing:.15em;
-  text-transform:uppercase;
-  user-select:none;
+  color:var(--muted);font-size:clamp(9px,.9vw,12px);
+  font-weight:720;line-height:1.3;letter-spacing:.14em;
+  text-align:center;text-transform:uppercase;user-select:none;white-space:nowrap;
 }
 .sr-only {
   position:absolute;width:1px;height:1px;padding:0;margin:-1px;
   overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
 }
 @media(max-width:1080px) {
-  .timer-shell {padding:25px 17px}
-  .unit {min-height:166px;gap:12px}
   .dial {width:min(100%,130px)}
-  .value {font-size:clamp(34px,4vw,54px)}
+  .value {font-size:clamp(47px,5.5vw,71px)}
 }
 @media(max-width:830px) {
-  .timer-shell {max-width:560px;padding:25px 15px;border-radius:23px}
-  .grid {grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
-  .unit {min-height:0;aspect-ratio:1/1.16;padding:12px 4px;gap:12px}
-  .unit:not(:last-child)::after {display:none}
-  .dial {width:min(90%,143px)}
-  .value {font-size:clamp(36px,7vw,55px)}
+  .timer-shell {max-width:560px}
+  .grid {grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 13px}
+  .unit {gap:13px}
+  .dial {width:min(92%,143px)}
+  .value {font-size:clamp(53px,10vw,77px)}
   .label {font-size:clamp(9px,1.8vw,11px)}
 }
 @media(max-width:480px) {
   .screen {padding:12px}
-  .timer-shell {padding:20px 10px}
-  .grid {gap:7px}
-  .unit {border-radius:14px;gap:10px;padding:10px 2px}
-  .dial {width:min(92%,113px)}
+  .grid {gap:25px 10px}
+  .unit {gap:11px}
+  .dial {width:min(94%,113px)}
   .dial::before {inset:6px}
-  .value {font-size:clamp(30px,8.6vw,45px)}
+  .value {font-size:clamp(43px,13vw,63px)}
   .label {font-size:clamp(8px,2.4vw,10px);letter-spacing:.07em}
 }
 @media(max-width:350px) {
   .screen {padding:8px}
-  .timer-shell {padding:19px 7px}
-  .grid {gap:5px}
-  .value {font-size:30px}
+  .grid {gap:22px 7px}
+  .value {font-size:43px}
   .label {font-size:8px;letter-spacing:0}
 }
 @media(prefers-reduced-motion:reduce) {
   *,*::before,*::after {animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .dial {transition:none!important}
 }
-
-/* MX Timer | watch-inspired slender numerals and finely lit 3D chronograph rings */
-@property --progress {syntax:"<percentage>";initial-value:34%;inherits:false}
-@property --arc-light {syntax:"<color>";initial-value:#e2fff5;inherits:false}
-@property --arc-mid {syntax:"<color>";initial-value:#80ffda;inherits:false}
-@property --arc-main {syntax:"<color>";initial-value:#24ffaa;inherits:false}
-@property --arc-track {syntax:"<color>";initial-value:#12352d;inherits:false}
-.dial {
-  --progress:34%;
-  --arc-light:#e2fff5;
-  --arc-mid:#80ffda;
-  --arc-main:#24ffaa;
-  --arc-track:#13382e;
-  background: conic-gradient(
-    from -90deg,
-    var(--arc-light) 0%,
-    var(--arc-mid) 2.5%,
-    var(--arc-main) var(--progress),
-    var(--arc-track) var(--progress),
-    var(--arc-track) 100%
-  );
-  box-shadow:
-    0 0 0 1px color-mix(in srgb,var(--arc-mid) 35%,transparent),
-    0 1px 1px rgba(255,255,255,.09) inset,
-    0 0 8px color-mix(in srgb,var(--arc-main) 36%,transparent),
-    0 0 26px color-mix(in srgb,var(--arc-main) 26%,transparent),
-    0 0 51px color-mix(in srgb,var(--arc-main) 11%,transparent);
-  transition:
-    --progress .78s cubic-bezier(.2,.73,.22,1),
-    --arc-light .72s ease,
-    --arc-mid .72s ease,
-    --arc-main .72s ease,
-    --arc-track .72s ease,
-    box-shadow .72s ease,
-    filter .72s ease;
-  filter:saturate(1.045);
-  will-change:auto;
-}
-.dial.warn {
-  --arc-light:#fffde8;
-  --arc-mid:#ffe582;
-  --arc-main:#ffc341;
-  --arc-track:#48371b;
-}
-.dial.danger {
-  --arc-light:#ffeae9;
-  --arc-mid:#ff9993;
-  --arc-main:#ff4d46;
-  --arc-track:#492021;
-}
-.dial::before {
-  background:
-    radial-gradient(ellipse at 47% 8%,rgba(214,255,242,.13),transparent 47%),
-    radial-gradient(ellipse at 50% 38%,#182d30 0%,#0b191c 56%,#071114 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(227,255,247,.13),
-    inset 0 3px 6px rgba(255,255,255,.025),
-    inset 0 -17px 33px rgba(0,0,0,.42),
-    0 0 14px rgba(0,0,0,.27);
-}
-.dial::after {
-  background:
-    radial-gradient(ellipse at 24% 16%,rgba(255,255,255,.34),transparent 26%),
-    linear-gradient(160deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 19%,transparent 33%,transparent 73%,rgba(255,255,255,.035) 100%);
-}
-.shine {
-  width:56%;
-  height:20%;
-  top:7%;
-  left:17%;
-  background:linear-gradient(180deg,rgba(255,255,255,.19),rgba(255,255,255,.015) 73%,transparent);
-  filter:blur(3.3px);
-}
-/* Open-license condensed numerals approximate Zenith; Apple's proprietary font isn't embedded. */
-.value {
-  display:inline-flex;
-  justify-content:center;
-  align-items:center;
-  gap:.008em;
-  width:100%;
-  height:1.18em;
-  font-family:"Barlow Condensed","SF Pro Display","SF Compact Display","Arial Narrow",sans-serif;
-  font-weight:600;
-  font-size:clamp(56px,6.0vw,88px);
-  line-height:1;
-  letter-spacing:0;
-  font-stretch:condensed;
-  font-feature-settings:"tnum" 1, "ss01" 1, "ss02" 1;
-  transform:scaleX(.88);
-  text-shadow:0 1px 1px rgba(0,0,0,.38),0 0 11px rgba(255,255,255,.09);
-  backface-visibility:hidden;
-}
-.digit-window {
-  position:relative;
-  display:inline-block;
-  flex:0 0 .54em;
-  width:.54em;
-  height:1.12em;
-  overflow:hidden;
-}
-.digit-face {
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#f6fffd;
-  line-height:1;
-  font-variant-numeric:tabular-nums;
-  will-change:transform,opacity;
-  backface-visibility:hidden;
-}
-@media(max-width:1080px) {
-  .value {font-size:clamp(47px,5.5vw,71px)}
-}
-@media(max-width:830px) {
-  .value {font-size:clamp(53px,10vw,77px)}
-}
-@media(max-width:480px) {
-  .value {font-size:clamp(43px,13vw,63px)}
-}
-@media(max-width:350px) {
-  .value {font-size:43px}
-}
-
 </style>
 </head>
 <body>
 <div class="screen">
   <main class="timer-shell" aria-label="Live countdown to March 4, 2027">
-    <section class="grid" id="timer" role="timer" aria-live="off"><div class="unit"><div class="dial"><span class="shine" aria-hidden="true"></span><span id="months" class="value">--</span></div><span class="label">MONTHS</span></div>
-<div class="unit"><div class="dial"><span class="shine" aria-hidden="true"></span><span id="weeks" class="value">--</span></div><span class="label">WEEKS</span></div>
-<div class="unit"><div class="dial"><span class="shine" aria-hidden="true"></span><span id="days" class="value">--</span></div><span class="label">DAYS</span></div>
-<div class="unit"><div class="dial"><span class="shine" aria-hidden="true"></span><span id="hours" class="value">--</span></div><span class="label">HOURS</span></div>
-<div class="unit"><div class="dial"><span class="shine" aria-hidden="true"></span><span id="minutes" class="value">--</span></div><span class="label">MINUTES</span></div>
-<div class="unit"><div class="dial"><span class="shine" aria-hidden="true"></span><span id="seconds" class="value">--</span></div><span class="label">SECONDS</span></div></section>
+    <section class="grid" id="timer" role="timer" aria-live="off"><div class="unit"><div class="dial"><span id="months" class="value">--</span></div><span class="label">MONTHS</span></div>
+<div class="unit"><div class="dial"><span id="weeks" class="value">--</span></div><span class="label">WEEKS</span></div>
+<div class="unit"><div class="dial"><span id="days" class="value">--</span></div><span class="label">DAYS</span></div>
+<div class="unit"><div class="dial"><span id="hours" class="value">--</span></div><span class="label">HOURS</span></div>
+<div class="unit"><div class="dial"><span id="minutes" class="value">--</span></div><span class="label">MINUTES</span></div>
+<div class="unit"><div class="dial"><span id="seconds" class="value">--</span></div><span class="label">SECONDS</span></div></section>
   </main>
 </div>
 <div class="sr-only" id="screenreader" aria-live="polite" aria-atomic="true"></div>
