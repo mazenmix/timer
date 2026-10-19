@@ -233,6 +233,31 @@ body{
   .screen {gap:25px}
   .quote-footer p {font-size:16px}
 }
+
+/* Rotating time quotes: smooth optical light pulse on the black background. */
+.quote-footer {min-height:clamp(76px,9vh,108px);display:grid;place-items:center}
+.quote-footer p {
+  opacity:1;
+  transition:opacity .4s ease, transform .4s cubic-bezier(.22,.75,.3,1),filter .4s ease;
+}
+.quote-footer p.quote-exit {
+  opacity:0;transform:translateY(-7px) scale(.987);filter:blur(3px);
+}
+.quote-footer p.quote-arrive {
+  animation:mx-quote-glow .95s cubic-bezier(.2,.7,.25,1) both;
+}
+@keyframes mx-quote-glow {
+  0% {opacity:0;transform:translateY(8px) scale(.985);filter:blur(4px);text-shadow:0 0 0 transparent}
+  46% {opacity:1;transform:translateY(-1px);filter:blur(0);text-shadow:0 0 7px rgba(255,255,255,.75),0 0 20px rgba(255,255,255,.5),0 0 34px rgba(255,255,255,.24)}
+  100% {opacity:1;transform:none;filter:blur(0);text-shadow:0 0 3px rgba(255,255,255,.42),0 0 11px rgba(255,255,255,.46),0 0 26px rgba(255,255,255,.2)}
+}
+@media(max-width:600px){.quote-footer{min-height:88px}}
+@media(prefers-reduced-motion:reduce){
+  .quote-footer p{transition:none!important}
+  .quote-footer p.quote-exit{opacity:1;transform:none;filter:none}
+  .quote-footer p.quote-arrive{animation:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -446,23 +471,50 @@ body{
   </script>
 
   <script>
-    (function(){
-      "use strict";
-      const lines = ["كل دقيقة تأجل بيها حياتك، هي دقيقة مستحيل ترجع.","الوقت ما ينتظر أحد. يا تتحرك، يا تبقى مكانك والعمر يمشي.","ماكو يوم مثالي راح يجي وينقذك. ابدأ باليوم الموجود.","الأعذار ما تبني مستقبل. الشغل وحده يغيّر الواقع.","كل مرة تكول باچر، إنت تتنازل عن فرصة اليوم.","السنين ما تضيع فجأة؛ تضيع من دقائق تكول عنها مو مهمة.","إذا تنتظر الظروف تصير مثالية، راح تنتظر عمرك كله.","لا تحسب شكد باقي. احسب شنو سويت بالوقت اللي راح.","الندم ما يرجّع ساعة وحدة. القرار اليوم بيدك.","الوقت اللي تقتله هسه، راح تحتاجه يوم وما تلگاه.","مو كل شخص مشغول ديتقدم. التقدم يحتاج فعل، مو ضوضاء.","الأيام ما توقف حتى تلحگ أحلامك. إنت لازم تتحرك.","الفرص ما تدگ الباب للأبد. ترددك إله ثمن.","حياتك ما تتغير لأنك فكرت هواية. تتغير من تسوي شي.","لا تنتظر الدافع. انضباطك لازم يشتغل حتى من ما إلك خلك.","بعد سنة راح تتمنى لو بديت اليوم. لا تعيد نفس الغلطة.","كل تأجيل بسيط يتراكم، وبالنهاية يصير عمر كامل.","إذا تريد نتيجة مختلفة، لازم يومك ما يبقى نفس البارحة.","راقب أفعالك، مو وعودك لنفسك. النتائج ما تسمع الكلام.","ماكو أحد مسؤول عن وقتك غيرك. لا تضيّعه وتلوم الظروف.","الخوف من البداية ما يحميك؛ بس يسرق منك الوقت.","العمر ما يعوّض أيامك الفارغة. املأها بشي يستحق.","من تضيع ساعة بإرادتك، لا تستغرب من ضياع سنين بدون قصد.","لا تنتظر اللحظة المناسبة. اصنعها قبل ما تنتهي الفرصة.","إذا ما تبدي هسه، راح تبقى تعرف شتريد وما توصل إله.","كل يوم تأجّل بيه قرارك، هو قرار إنك تبقى بنفس المكان.","وقت الانتظار ممكن يكون وقت الإنجاز. الخيار إلك.","اللي تسويه اليوم أقوى من ألف خطة نايمات براسك.","العمر مو بروفة. كل يوم يمر محسوب عليك.","انشغل ببناء حياتك بدل ما تنتظرها تبدي."];
-      let previous = -1;
-      try {
-        const saved = window.sessionStorage.getItem("mx-timer-last-quote");
-        if (saved !== null) {
-          const parsed = Number(saved);
-          if (Number.isInteger(parsed) && parsed >= 0 && parsed < lines.length) previous = parsed;
-        }
-      } catch (_) { /* Storage may be disabled; quotes still work. */ }
-      let choice = Math.floor(Math.random() * (lines.length - (previous >= 0 ? 1 : 0)));
-      if (previous >= 0 && choice >= previous) choice++;
-      const target = document.getElementById("daily-quote");
-      if (target) target.textContent = lines[choice];
-      try { window.sessionStorage.setItem("mx-timer-last-quote", String(choice)); } catch (_) {}
-    })();
-  </script>
+
+(function () {
+ "use strict";
+ const lines = ["كل دقيقة تأجل بيها حياتك، هي دقيقة مستحيل ترجع.","الوقت ما ينتظر أحد. يا تتحرك، يا تبقى مكانك والعمر يمشي.","ماكو يوم مثالي راح يجي وينقذك. ابدأ باليوم الموجود.","الأعذار ما تبني مستقبل. الشغل وحده يغيّر الواقع.","كل مرة تكول باچر، إنت تتنازل عن فرصة اليوم.","السنين ما تضيع فجأة؛ تضيع من دقائق تكول عنها مو مهمة.","إذا تنتظر الظروف تصير مثالية، راح تنتظر عمرك كله.","لا تحسب شكد باقي. احسب شنو سويت بالوقت اللي راح.","الندم ما يرجّع ساعة وحدة. القرار اليوم بيدك.","الوقت اللي تقتله هسه، راح تحتاجه يوم وما تلگاه.","مو كل شخص مشغول ديتقدم. التقدم يحتاج فعل، مو ضوضاء.","الأيام ما توقف حتى تلحگ أحلامك. إنت لازم تتحرك.","الفرص ما تدگ الباب للأبد. ترددك إله ثمن.","حياتك ما تتغير لأنك فكرت هواية. تتغير من تسوي شي.","لا تنتظر الدافع. انضباطك لازم يشتغل حتى من ما إلك خلك.","بعد سنة راح تتمنى لو بديت اليوم. لا تعيد نفس الغلطة.","كل تأجيل بسيط يتراكم، وبالنهاية يصير عمر كامل.","إذا تريد نتيجة مختلفة، لازم يومك ما يبقى نفس البارحة.","راقب أفعالك، مو وعودك لنفسك. النتائج ما تسمع الكلام.","ماكو أحد مسؤول عن وقتك غيرك. لا تضيّعه وتلوم الظروف.","الخوف من البداية ما يحميك؛ بس يسرق منك الوقت.","العمر ما يعوّض أيامك الفارغة. املأها بشي يستحق.","من تضيع ساعة بإرادتك، لا تستغرب من ضياع سنين بدون قصد.","لا تنتظر اللحظة المناسبة. اصنعها قبل ما تنتهي الفرصة.","إذا ما تبدي هسه، راح تبقى تعرف شتريد وما توصل إله.","كل يوم تأجّل بيه قرارك، هو قرار إنك تبقى بنفس المكان.","وقت الانتظار ممكن يكون وقت الإنجاز. الخيار إلك.","اللي تسويه اليوم أقوى من ألف خطة نايمات براسك.","العمر مو بروفة. كل يوم يمر محسوب عليك.","انشغل ببناء حياتك بدل ما تنتظرها تبدي."];
+ const target = document.getElementById("daily-quote");
+ if (!target) return;
+ const key = "mx-timer-last-quote";
+ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+ let previous = -1;
+ let busy = false;
+ try {
+   const saved = window.sessionStorage.getItem(key);
+   const index = Number(saved);
+   if (saved !== null && Number.isInteger(index) && index >= 0 && index < lines.length) previous=index;
+ } catch (_) {}
+ function different() {
+   let choice = Math.floor(Math.random() * (lines.length - (previous >= 0 ? 1 : 0)));
+   if (previous >= 0 && choice >= previous) choice++;
+   return choice;
+ }
+ function show() {
+   const index = different();
+   previous = index;
+   target.textContent = lines[index];
+   try {window.sessionStorage.setItem(key,String(index));} catch (_) {}
+ }
+ show();
+ function cycle() {
+   if (busy) return;
+   if (reducedMotion.matches) {show(); return;}
+   busy = true;
+   target.classList.remove("quote-arrive");
+   target.classList.add("quote-exit");
+   window.setTimeout(function () {
+     show();
+     target.classList.remove("quote-exit");
+     void target.offsetWidth;
+     target.classList.add("quote-arrive");
+     window.setTimeout(function () { target.classList.remove("quote-arrive"); busy=false; }, 950);
+   }, 400);
+ }
+ window.setInterval(cycle,15000);
+})();
+
+</script>
 </body>
 </html>
