@@ -136,6 +136,55 @@ body{
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+/* SVG lettering closely follows the tall, fine, rounded watch numerals in the reference. */
+.value {
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  height:1em;
+  font-size:clamp(93px,10.2vw,134px);
+  font-family:inherit;
+  font-weight:400;
+  font-variant-numeric:tabular-nums;
+  transform:none;
+  gap:0;
+  white-space:nowrap;
+  color:#f8fffd;
+}
+.digit-window {
+  position:relative;
+  display:block;
+  flex:0 0 .375em;
+  width:.375em;
+  height:1em;
+  overflow:hidden;
+}
+.digit-face {
+  display:block;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  color:#f6f7f7;
+  overflow:visible;
+  backface-visibility:hidden;
+  will-change:transform,opacity;
+}
+@media(max-width:1080px) {
+  .value {font-size:clamp(74px,9vw,110px)}
+}
+@media(max-width:830px) {
+  .value {font-size:clamp(88px,17vw,128px)}
+}
+@media(max-width:480px) {
+  .value {font-size:clamp(72px,20vw,97px)}
+}
+@media(max-width:350px) {
+  .value {font-size:72px}
+}
+
 </style>
 </head>
 <body>
@@ -207,12 +256,26 @@ body{
       }
 
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-      // Each digit slides independently, keeping a stable baseline and avoiding text-width jumps.
+      // Custom resolution-independent watch-face glyphs: tall, narrow strokes.
+      // SVG outlines make the silhouette consistent on iPhone, desktop and retina screens.
+      const numeralPaths = const NUMERAL_PATHS = {"0":"M24 8 C13 8 9 20 9 36 V92 C9 111 14 120 24 120 C34 120 39 111 39 92 V36 C39 20 35 8 24 8 Z","1":"M9 24 L24 9 V119","2":"M9 34 C9 17 14 8 24 8 C35 8 40 18 40 34 C40 48 34 57 25 70 L9 119 H41","3":"M9 20 C13 12 18 8 25 8 C35 8 40 18 40 33 C40 50 34 60 23 62 C35 63 41 74 41 91 C41 111 35 120 24 120 C14 120 9 111 8 103","4":"M36 119 V8 L7 86 H43","5":"M40 9 H13 L10 59 C15 54 21 51 27 53 C37 56 41 70 41 89 C41 110 35 120 24 120 C14 120 9 112 8 103","6":"M39 18 C35 11 31 8 24 8 C12 8 8 23 8 42 V89 C8 109 13 120 24 120 C35 120 40 108 40 90 C40 73 35 64 24 64 C13 64 8 75 8 90","7":"M7 9 H42 L17 119","8":"M24 8 C13 8 9 18 9 34 C9 50 14 60 24 60 C34 60 39 50 39 34 C39 18 35 8 24 8 Z M24 60 C12 60 8 72 8 89 C8 109 13 120 24 120 C35 120 40 109 40 89 C40 72 36 60 24 60 Z","9":"M40 43 C40 23 35 8 24 8 C13 8 8 20 8 39 C8 58 13 68 24 68 C35 68 40 58 40 43 V89 C40 109 35 120 24 120 C17 120 12 116 9 109"};;
       function newGlyph(char) {
-        const glyph = document.createElement("span");
-        glyph.className = "digit-face";
-        glyph.textContent = char;
-        return glyph;
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 48 128");
+        svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+        svg.setAttribute("class", "digit-face");
+        svg.setAttribute("aria-hidden", "true");
+        svg.setAttribute("focusable", "false");
+        svg.dataset.digit = char;
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", numeralPaths[char] || numeralPaths["0"]);
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "currentColor");
+        path.setAttribute("stroke-width", "8.7");
+        path.setAttribute("stroke-linecap", "round");
+        path.setAttribute("stroke-linejoin", "round");
+        svg.appendChild(path);
+        return svg;
       }
       function setNumber(node, number) {
         const text = String(number).padStart(2, "0");
@@ -234,8 +297,8 @@ body{
         [...node.children].forEach(function(win, i) {
           const nextChar = text[i];
           if (win.dataset.digit === nextChar) return;
+          const prevChar = win.dataset.digit || "0";
           win.dataset.digit = nextChar;
-          const prevChar = win.querySelector(".digit-face")?.textContent || "0";
           const outgoing = newGlyph(prevChar);
           const incoming = newGlyph(nextChar);
           win.replaceChildren(outgoing, incoming);
@@ -243,20 +306,20 @@ body{
             win.replaceChildren(incoming);
             return;
           }
-          const options = { duration: 520, easing: "cubic-bezier(.19,.75,.2,1)", fill: "forwards" };
+          const options = { duration: 540, easing: "cubic-bezier(.19,.75,.2,1)", fill: "forwards" };
           outgoing.animate([
-            { transform: "translate3d(0,0,0)", opacity: 1, filter: "blur(0px)" },
-            { transform: "translate3d(0,42%,0)", opacity: 0, filter: "blur(.9px)" }
+            { transform: "translate3d(0,0,0)", opacity: 1 },
+            { transform: "translate3d(0,43%,0)", opacity: 0 }
           ], options);
           const animation = incoming.animate([
-            { transform: "translate3d(0,-43%,0)", opacity: 0, filter: "blur(.9px)" },
-            { transform: "translate3d(0,0,0)", opacity: 1, filter: "blur(0px)" }
+            { transform: "translate3d(0,-43%,0)", opacity: 0 },
+            { transform: "translate3d(0,0,0)", opacity: 1 }
           ], options);
           animation.finished.then(function() {
             if (win.dataset.digit === nextChar && incoming.parentNode === win) {
               win.replaceChildren(incoming);
             }
-          }).catch(function(){ /* Newer digit superseded this animation. */ });
+          }).catch(function(){ /* The next digit may supersede the prior animation. */ });
         });
       }
 
