@@ -270,15 +270,6 @@ body{
   align-items:center;
   gap:clamp(10px,1.8vh,17px);
 }
-.remaining-heading {
-  margin:0;
-  color:#d6f8e9;
-  font-family:Tahoma,"Segoe UI",Arial,sans-serif;
-  font-size:clamp(13px,1.3vw,17px);
-  font-weight:700;
-  line-height:1.3;
-  text-align:center;
-}
 .remaining-grid {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -313,8 +304,7 @@ body{
 <body>
 <div class="screen">
   <main class="timer-shell" aria-label="Live countdown to March 4, 2027">
-    <section class="remaining-summary" aria-labelledby="remaining-heading">
-      <h2 class="remaining-heading" id="remaining-heading" lang="ar" dir="rtl">كم باقي</h2>
+    <section class="remaining-summary" aria-label="Remaining time until March 4, 2027">
       <div class="remaining-grid" role="group" aria-label="Total months, weeks and days remaining">
         <div class="unit"><div class="dial"><span id="total-months" class="value">--</span></div><span class="label">MONTHS LEFT</span></div>
         <div class="unit"><div class="dial"><span id="total-weeks" class="value">--</span></div><span class="label">WEEKS LEFT</span></div>
