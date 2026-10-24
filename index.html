@@ -272,11 +272,11 @@ body{
 }
 .remaining-grid {
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:repeat(2,minmax(0,1fr));
   justify-items:center;
   align-items:start;
   gap:clamp(12px,2vw,26px);
-  width:min(430px,100%);
+  width:min(310px,100%);
   margin-inline:auto;
 }
 .remaining-grid .unit {width:100%;gap:9px}
@@ -286,14 +286,14 @@ body{
 .remaining-grid .value[data-digits="3"] {font-size:clamp(40px,3.9vw,48px)}
 .remaining-grid .label {font-size:clamp(9px,.82vw,11px);letter-spacing:.08em}
 @media(max-width:830px) {
-  .remaining-grid {width:min(370px,100%)}
+  .remaining-grid {width:min(280px,100%)}
   .remaining-grid .dial {width:min(100%,100px)}
   .remaining-grid .value {font-size:50px}
   .remaining-grid .value[data-digits="3"] {font-size:42px}
 }
 @media(max-width:480px) {
   .timer-shell {gap:clamp(22px,3.5vh,32px)}
-  .remaining-grid {width:min(100%,338px);gap:9px}
+  .remaining-grid {width:min(100%,246px);gap:12px}
   .remaining-grid .dial {width:min(100%,90px)}
   .remaining-grid .value {font-size:46px}
   .remaining-grid .value[data-digits="3"] {font-size:37px}
@@ -310,8 +310,7 @@ body{
 <div class="screen">
   <main class="timer-shell" aria-label="Live countdown to March 4, 2027">
     <section class="remaining-summary" aria-label="Remaining time until March 4, 2027">
-      <div class="remaining-grid" role="group" aria-label="Total months, weeks and days remaining">
-        <div class="unit"><div class="dial"><span id="total-months" class="value">--</span></div><span class="label">MONTHS LEFT</span></div>
+      <div class="remaining-grid" role="group" aria-label="Total weeks and days remaining">
         <div class="unit"><div class="dial"><span id="total-weeks" class="value">--</span></div><span class="label">WEEKS LEFT</span></div>
         <div class="unit"><div class="dial"><span id="total-days" class="value">--</span></div><span class="label">DAYS LEFT</span></div>
       </div>
@@ -337,7 +336,7 @@ body{
         timeZone: "Asia/Baghdad", year: "numeric", month: "2-digit", day: "2-digit",
         hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
       });
-      const ids = ["total-months", "total-weeks", "total-days", "months", "weeks", "days", "hours", "minutes", "seconds"];
+      const ids = ["total-weeks", "total-days", "months", "weeks", "days", "hours", "minutes", "seconds"];
       const nodes = Object.fromEntries(ids.map(function(id) { return [id, document.getElementById(id)]; }));
       const screenreader = document.getElementById("screenreader");
       let lastAnnouncement = -1;
@@ -452,7 +451,7 @@ body{
       }
 
       // Real 60-mark bezel: 60 SVG line segments (every fifth one is longer).
-      const unitMax = [6, 20, 140, 12, 4, 7, 24, 60, 60];
+      const unitMax = [20, 140, 12, 4, 7, 24, 60, 60];
       const ns = "http://www.w3.org/2000/svg";
       const tickSets = ids.map(function(id) {
         const dial = nodes[id].closest(".dial");
@@ -495,7 +494,6 @@ body{
         const numbers = breakdown(Math.floor(now / 1000) * 1000);
         // Independent totals, not the leftover weeks/days shown in the main counters.
         const totals = [
-          numbers[0],
           Math.floor(remaining / 604800000),
           Math.floor(remaining / 86400000)
         ];
